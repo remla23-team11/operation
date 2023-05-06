@@ -1,0 +1,10 @@
+services:
+  backend:
+    image: ghcr.io/remla23-team11/app:latest
+
+  frontend:
+    image: ghcr.io/remla23-team11/model-service:latest
+    ports:
+      - 8080
+    environment:
+      - BACKEND_URL=backend:5000
