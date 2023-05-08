@@ -1,0 +1,1 @@
+You can find an example docker compose file in this folder that can be used to run the service stack locally.
