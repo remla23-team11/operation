@@ -15,9 +15,9 @@ services:
     ports:
       - 8080
     environment:
-      - BACKEND_URL=localhost:5000
+      - REACT_APP_API_URL=backend:8080
 ```
 
 ## Variables
 
-* BACKEND_URL - Used to set the backend URL that the frontend has to communicate with.
+* REACT_APP_API_URL — Used to set the backend URL that the frontend has to communicate with.
