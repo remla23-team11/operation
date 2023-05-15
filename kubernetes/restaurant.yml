@@ -18,7 +18,6 @@ spec:
       containers:
         - name: model-service
           image: ghcr.io/remla23-team11/model-service:latest
-          imagePullPolicy: Never
           ports:
             - containerPort: 8080
 ---
