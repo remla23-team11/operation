@@ -102,4 +102,4 @@ kind: ConfigMap
 metadata:
   name: my-config
 data:
-  model.host: "http://localhost"
+  model.host: "http://model-service-serv:8080"
