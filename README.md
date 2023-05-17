@@ -55,6 +55,7 @@ $ helm repo list
 NAME       URL
 prom-repo  https://prometheus-community.github.io/helm-charts
 ```
+You can run helm repo remove prom-repo should you ever wish to remove it again.
 
 #### 5. Install Prometheus Stack
 The output contains an important information: the Prometheus instance is labeled with release=myprom.
