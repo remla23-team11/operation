@@ -75,7 +75,7 @@ Apply the file by the command:
 ```
 $ kubectl apply -f /kubernetes/restaurant.yml
 ```
-Once all **Pods** are in the state Running, run the command below to create a tunnel (keep the terminal open) for the Ingress and open localhost/app in your browser to access the frontend. 
+Once all **Pods** are in the state Running, run the command below to create a tunnel (keep the terminal open) for the Ingress and open **localhost/app** in your browser to access the frontend. 
 ```
 $ minikube tunnel
 ```
