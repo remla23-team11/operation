@@ -12,4 +12,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Validate docker-compose file
-        run: yamllint docker/docker-compose.yml
+      - run: yamllint docker/docker-compose.yml
+      - run: yamllint kubernetes/restaurant.yml
