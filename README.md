@@ -40,7 +40,7 @@ $ minikube addons enable ingress
 $ minikube dashboard
 ```
 
-####4. Add Prometheus Repository. 
+#### 4. Add Prometheus Repository. 
 Run the following commands to install the Prometheus stack in your cluster.
 ```
 $ helm repo add prom-repo https://prometheus-community.github.io/helm-charts
@@ -56,7 +56,7 @@ NAME       URL
 prom-repo  https://prometheus-community.github.io/helm-charts
 ```
 
-####5. Install Prometheus Stack
+#### 5. Install Prometheus Stack
 The output contains an important information: the Prometheus instance is labeled with release=myprom.
 ```
 $ helm install myprom prom-repo/kube-prometheus-stack
@@ -70,7 +70,7 @@ By default, Prometheus does not have an Ingress, so we need to use a port-forwar
 $ minikube service myprom-kube-prometheus-sta-prometheus --url
 ```
 
-####6. Apply the configuration
+#### 6. Apply the configuration
 Apply the file by the command:
 ```
 $ kubectl apply -f /kubernetes/restaurant.yml
