@@ -82,3 +82,15 @@ $ minikube tunnel
 At the user interface, for example, "We are glad we found this place." will be analyzed as a positive sentiment.
 After pressing 'analyze', the feedback option will appear and after selecting the feedback, submit option will appear.
 Related metrics will be monitored by prometheus and can be observed through the dashboard.
+
+
+## Using Grafana Dashboard
+After setting up the Kubernetes and Prometheus, one can make use of the Grafana dashboard to monitor the service.
+
+You first get the URL to Grafana.
+```
+$ minikube service myprom-grafana --url
+```
+Then you login with username `admin` and password `prom-operator`.
+
+Navigate to the dashboards under Home > Dashboards and load the json file in the `./grafana/grafana.json` by clicking New > Import.
