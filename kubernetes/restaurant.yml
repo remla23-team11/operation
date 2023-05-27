@@ -75,29 +75,29 @@ spec:
     - port: 3000
       targetPort: 3000
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: my-ingress
-
-spec:
-  rules:
-  - http:
-      paths:
-      - pathType: Prefix
-        path: "/app"
-        backend:
-          service:
-            name: app-serv
-            port:
-              number: 3000
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: model-service-serv
-            port:
-              number: 8080
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: my-ingress
+# 
+# spec:
+#   rules:
+#     - http:
+#         paths:
+#           - pathType: Prefix
+#             path: "/app"
+#             backend:
+#               service:
+#                 name: app-serv
+#                 port:
+#                   number: 3000
+#           - pathType: Prefix
+#             path: "/"
+#             backend:
+#               service:
+#                 name: model-service-serv
+#                 port:
+#                   number: 8080
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -110,7 +110,7 @@ spec:
     matchLabels:
       app: model-service-label
   endpoints:
-  - interval: 1s
+    - interval: 1s
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -118,3 +118,45 @@ metadata:
   name: my-config
 data:
   model.host: "http://localhost"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: my-istio-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: my-virtual-service
+spec:
+  gateways:
+    - my-istio-gateway
+  hosts:
+    - "*"
+  http:
+    - match:
+        - uri:
+            prefix: /app
+      route:
+        - destination:
+            host: app-serv
+            port:
+              number: 3000
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: model-service-serv
+            port:
+              number: 8080
