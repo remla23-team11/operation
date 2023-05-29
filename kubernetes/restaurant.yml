@@ -37,18 +37,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-depl
+  name: app-depl-stable
   labels:
     app: app
+    version: stable
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: app
+      version: stable
   template:
     metadata:
       labels:
         app: app
+        version: stable
     spec:
       containers:
         - name: app
@@ -63,6 +66,49 @@ spec:
                   key: model.host
             - name: PUBLIC_URL
               value: "/app"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-depl-canary
+  labels:
+    app: app
+    version: canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: app
+        version: canary
+    spec:
+      containers:
+        - name: helloworld
+          image: docker.io/istio/examples-helloworld-v1
+          resources:
+            requests:
+              cpu: "100m"
+          imagePullPolicy: IfNotPresent #Always
+          ports:
+            - containerPort: 3000
+    # spec:
+    #   containers:
+    #     - name: app
+    #       image: ghcr.io/remla23-team11/app:latest
+    #       ports:
+    #         - containerPort: 3000
+    #       env:
+    #         - name: REACT_APP_API_URL
+    #           valueFrom:
+    #             configMapKeyRef:
+    #               name: my-config
+    #               key: model.host
+    #         - name: PUBLIC_URL
+    #           value: "/app"
 ---
 apiVersion: v1
 kind: Service
@@ -150,8 +196,16 @@ spec:
       route:
         - destination:
             host: app-serv
+            subset: stable
             port:
               number: 3000
+          weight: 50
+        - destination:
+            host: app-serv
+            subset: canary
+            port:
+              number: 3000
+          weight: 50
     - match:
         - uri:
             prefix: /
@@ -160,6 +214,20 @@ spec:
             host: model-service-serv
             port:
               number: 8080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: my-destination-rule
+spec:
+  host: app-serv
+  subsets:
+    - name: stable
+      labels:
+        version: stable
+    - name: canary
+      labels:
+        version: canary
 ---
 # begin rate limiting
 apiVersion: v1
@@ -343,12 +411,12 @@ spec:
           load_assignment:
             cluster_name: rate_limit_cluster
             endpoints:
-            - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: ratelimit.default.svc.cluster.local
-                      port_value: 8081
+              - lb_endpoints:
+                  - endpoint:
+                      address:
+                        socket_address:
+                          address: ratelimit.default.svc.cluster.local
+                          port_value: 8081
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
