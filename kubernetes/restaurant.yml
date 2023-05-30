@@ -147,11 +147,51 @@ spec:
     - match:
         - uri:
             prefix: /app
+          headers:
+            cookie:
+              regex: ".*myAppVersion=stable.*"
       route:
         - destination:
-            host: app-serv
+            host: app-serv # stable
             port:
               number: 3000
+    - match:
+        - uri:
+            prefix: /app
+          headers:
+            cookie:
+              regex: ".*myAppVersion=canary.*"
+      route:
+        - destination:
+            host: app-serv # canary
+            port:
+              number: 3000
+    - match:
+        - uri:
+            prefix: /app
+          # default fallthrough suffices
+          # withoutHeaders:
+          #   cookie:
+          #     regex: ".*myAppVersion=(stable|canary).*"
+      route:
+        - destination:
+            host: app-serv # stable
+            port:
+              number: 3000
+          weight: 50
+          headers:
+            response:
+              set:
+                Set-Cookie: "myAppVersion=stable; Path=/app"
+        - destination:
+            host: app-serv # canary
+            port:
+              number: 3000
+          weight: 50
+          headers:
+            response:
+              set:
+                Set-Cookie: "myAppVersion=canary; Path=/app"
     - match:
         - uri:
             prefix: /
@@ -343,12 +383,12 @@ spec:
           load_assignment:
             cluster_name: rate_limit_cluster
             endpoints:
-            - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: ratelimit.default.svc.cluster.local
-                      port_value: 8081
+              - lb_endpoints:
+                  - endpoint:
+                      address:
+                        socket_address:
+                          address: ratelimit.default.svc.cluster.local
+                          port_value: 8081
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
