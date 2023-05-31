@@ -67,6 +67,39 @@ spec:
             - name: PUBLIC_URL
               value: "/app"
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-depl-canary
+  labels:
+    app: app
+    version: canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: app
+        version: canary
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/remla23-team11/app:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: REACT_APP_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: my-config
+                  key: model.host
+            - name: PUBLIC_URL
+              value: "/app"
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -156,6 +189,7 @@ spec:
       route:
         - destination:
             host: app-serv # stable
+            subset: stable
             port:
               number: 3000
     - match:
@@ -167,6 +201,7 @@ spec:
       route:
         - destination:
             host: app-serv # canary
+            subset: canary
             port:
               number: 3000
     - match:
@@ -189,6 +224,7 @@ spec:
                 Set-Cookie: "myAppVersion=stable; Path=/app"
         - destination:
             host: app-serv # canary
+            subset: canary
             port:
               number: 3000
           weight: 50
