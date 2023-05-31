@@ -222,11 +222,11 @@ spec:
           #     regex: ".*myAppVersion=(stable|canary).*"
       route:
         - destination:
-            host: app-serv
+            host: app-serv # stable
             subset: stable
             port:
               number: 3000
-          weight: 50
+          weight: 80
           headers:
             response:
               set:
@@ -236,7 +236,7 @@ spec:
             subset: canary
             port:
               number: 3000
-          weight: 50
+          weight: 20
           headers:
             response:
               set:
